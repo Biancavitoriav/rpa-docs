@@ -1,11 +1,10 @@
-import tagui as t
 import requests
 import os
+from dotenv import load_dotenv
 from flask import Flask, request, jsonify
 
-t.init()
-
 app = Flask(__name__)
+load_dotenv()
 
 
 @app.route('/ler-arquivo', methods=['POST'])
@@ -28,7 +27,7 @@ def ler_arquivo():
             return jsonify({"erro": f"Erro ao ler o arquivo: {str(e)}"}), 500
 
         url = "https://api.openai.com/v1/chat/completions"
-        
+        api_key = os.getenv("API_KEY")
 
         if not api_key:
             return jsonify({"erro": "Chave de API não fornecida"}), 400
