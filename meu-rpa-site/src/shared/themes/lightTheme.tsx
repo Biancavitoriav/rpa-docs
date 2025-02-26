@@ -7,5 +7,8 @@ export const LightTheme = createTheme({
             main: '#C2BDEC',
         },
        
-    }
+    },
+    typography: {
+        fontFamily: "'Inria Sans', sans-serif",
+      }
 })
