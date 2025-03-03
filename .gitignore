@@ -1,3 +1,6 @@
+# ignorar o node modules
+node_modules/
+
 # Ignorar arquivos de ambiente
 .env
 *.env
