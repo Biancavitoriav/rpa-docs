@@ -1,7 +1,20 @@
-const puppeteer = require("puppeteer");
+import express from "express";
+import puppeteer from "puppeteer";
+import cors from "cors";
+import axios from "axios";
 
-async function scrapeG1News(targetDate) {
-  const browser = await puppeteer.launch({ headless: false });
+const app = express();
+const PORT = 3001;
+
+app.use(
+  cors({
+    origin: "http://localhost:5173",
+  })
+);
+app.use(express.json());
+
+async function scrapeG1News() {
+  const browser = await puppeteer.launch({ headless: "new" });
   const page = await browser.newPage();
 
   await page.goto("https://g1.globo.com/", { waitUntil: "load", timeout: 0 });
@@ -45,7 +58,21 @@ async function scrapeG1News(targetDate) {
   return articles;
 }
 
-(async () => {
-  const news = await scrapeG1News();
-  console.log(news);
-})();
+app.get("/scrape-news", async (req, res) => {
+  try {
+    const news = await scrapeG1News();
+    // Chama a API Python para resumir as notícias
+    const response = await axios.post("http://127.0.0.1:5000/ler-arquivo", {
+      infos: JSON.stringify(news),
+    });
+
+    // Envia a resposta com os dados processados pela API Python
+    res.json(response.data); // Resposta final com os dados do GPT
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.listen(PORT, () => {
+  console.log(`Servidor rodando em http://localhost:${PORT}`);
+});

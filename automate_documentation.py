@@ -10,21 +10,8 @@ load_dotenv()
 @app.route('/ler-arquivo', methods=['POST'])
 def ler_arquivo():
     try:
-        dados = request.get_json()
-        caminho = dados.get("caminho")
-
-      
-        if not caminho:
-            return jsonify({"erro": "Caminho do arquivo não fornecido"}), 400
+        requestS = request.get_json()
         
-       
-        try:
-            with open(caminho, "r", encoding="utf-8") as f:
-                conteudo = f.read()
-        except FileNotFoundError:
-            return jsonify({"erro": "Arquivo não encontrado"}), 404
-        except Exception as e:
-            return jsonify({"erro": f"Erro ao ler o arquivo: {str(e)}"}), 500
 
         url = "https://api.openai.com/v1/chat/completions"
         api_key = os.getenv("API_KEY")
@@ -40,8 +27,8 @@ def ler_arquivo():
         data = {
             "model": "gpt-4",
             "messages": [
-                {"role": "system", "content": "Você é um assistente que sabe tudo sobre documentação de código. porém não quero que você descreva oq fez ou oq achou, apenas documente o código como se fosse um desenvolvedor"},
-                {"role": "user", "content": f"documente esse código: {conteudo}"}
+                {"role": "system", "content": "Você precisa resumir noticias da internet, o seu resumo precisa estar em markdown, desta forma os titulos terão ## para ser destacado"},
+                {"role": "user", "content": f"Segue as noticias para ser resumidas: {requestS}"}
             ],
             "temperature": 0.7
         }
@@ -50,7 +37,7 @@ def ler_arquivo():
 
         if response.status_code == 200:
             resultado = response.json()
-            return jsonify({"codigo_documentado": resultado['choices'][0]['message']['content']})
+            return jsonify({"resu": resultado['choices'][0]['message']['content']})
         else:
             return jsonify({"erro": f"Erro na API da OpenAI: {response.status_code}, {response.text}"}), 500
 
