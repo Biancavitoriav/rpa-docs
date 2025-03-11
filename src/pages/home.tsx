@@ -84,7 +84,6 @@ export default function EmailSummaryForm() {
           onChange={handleOnChangeInput}
         />
 
-        <TextField fullWidth label="Quantidade De Notícias (máx: 6)" margin="normal" />
         <br />
         <Button
           onClick={handleClick}
