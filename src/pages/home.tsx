@@ -63,15 +63,17 @@ export default function EmailSummaryForm() {
             <img src={bookIcon} alt="icone" style={{ width: 24, height: 24, marginRight: 8 }} />
             <Typography fontWeight="bold">Resumindo suas notícias</Typography>
           </Box>
+
         </Box>
       </Grid>
 
       {/* Formulário - Lado Esquerdo */}
-      <Grid item xs={8} md={4} marginTop={5}>
+      { <Grid item xs={8} md={4} marginTop={5}>
         <Typography variant="h5" fontWeight="bold">
           Resumo de notícias
         </Typography>
         <Typography marginTop="20px">Preencha os campos a seguir</Typography>
+
 
         <TextField
           fullWidth
@@ -81,6 +83,8 @@ export default function EmailSummaryForm() {
           value={limit}
           onChange={handleOnChangeInput}
         />
+
+        <TextField fullWidth label="Quantidade De Notícias (máx: 6)" margin="normal" />
         <br />
         <Button
           onClick={handleClick}
@@ -91,10 +95,10 @@ export default function EmailSummaryForm() {
         >
           {loading ? "Carregando..." : "Buscar Notícias"}
         </Button>
-      </Grid>
+      </Grid> }
 
       {/* Resumo - Lado Direito */}
-      <Grid item xs={12} md={8}>
+       <Grid item xs={12} md={8}> 
         <Box
           marginTop="50px"
           marginLeft="30px"
@@ -115,6 +119,6 @@ export default function EmailSummaryForm() {
           </Stack>
         </Box>
       </Grid>
-    </Grid>
+    // </Grid>
   );
 }
