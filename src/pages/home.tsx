@@ -2,38 +2,47 @@ import {
   Grid,
   TextField,
   Button,
-  Checkbox,
-  FormControlLabel,
   Typography,
   Box,
   Stack,
+  Skeleton,
 } from "@mui/material";
-import emailIcon from "../assets/email-icon.png";
+import bookIcon from "../assets/bookIcon.png";
 import { useState } from "react";
 import React from "react";
 
 export default function EmailSummaryForm() {
   const [news, setNews] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [limit, setLimit] = useState(0);
+
+  const handleOnChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = parseInt(event.target.value, 10) || 0;
+    setLimit(value);
+  };
+
+  const cleanResponse = (htmlString: string) => {
+    return htmlString.replace(/\n/g, "").trim(); // Remove quebras de linha e espaços extras
+  };
 
   const handleClick = async () => {
     setLoading(true);
     try {
       console.log("ENTROU NO HANDLE CLICK>>>>>>>>>");
-      const response = await fetch("http://localhost:3001/scrape-news");
-      const data = await response.json();
+
+      const response = await fetch(`http://localhost:3001/scrape-news?limit=${limit}`);
+      const data = await response.json(); // Pegando a resposta como JSON
 
       if (!response.ok) {
         throw new Error(`Erro na API: ${response.status}`);
       }
 
-      if (response.ok) {
-        setNews(data.result); // Exibe formatado
-        console.log(news);
-        console.log(data)
+      if (data.result) {
+        const cleanedHtml = cleanResponse(data.result); // Pegando apenas o "result" e limpando
+        setNews(cleanedHtml);
+        console.log(cleanedHtml);
       } else {
-        console.error("Erro no data");
-        alert("Erro ao buscar notícias");
+        console.error("Erro: 'result' não encontrado no JSON.");
       }
     } catch (error) {
       console.error("Erro ao chamar a API:", error);
@@ -50,29 +59,28 @@ export default function EmailSummaryForm() {
             padding: 2,
           }}
         >
-          <Typography fontWeight="bold" marginLeft="60px">
-            <img
-              src={emailIcon}
-              alt="icon"
-              width={24}
-              height={24}
-              style={{ marginRight: 8, marginTop: 8 }}
-            />
-            Resumindo seus e-mails
-          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+            <img src={bookIcon} alt="icone" style={{ width: 24, height: 24, marginRight: 8 }} />
+            <Typography fontWeight="bold">Resumindo suas notícias</Typography>
+          </Box>
         </Box>
       </Grid>
 
       {/* Formulário - Lado Esquerdo */}
       <Grid item xs={8} md={4} marginTop={5}>
         <Typography variant="h5" fontWeight="bold">
-          Leitura de e-mails
+          Resumo de notícias
         </Typography>
-        <Typography>Preencha os campos a seguir</Typography>
+        <Typography marginTop="20px">Preencha os campos a seguir</Typography>
 
-        <TextField fullWidth label="Data" margin="normal" />
-        <TextField fullWidth label="Email" margin="normal" />
-        <TextField fullWidth label="Senha" margin="normal" type="password" />
+        <TextField
+          fullWidth
+          label="Quantidade De Notícias (máx: 6)"
+          margin="normal"
+          type="number"
+          value={limit}
+          onChange={handleOnChangeInput}
+        />
         <br />
         <Button
           onClick={handleClick}
@@ -82,7 +90,6 @@ export default function EmailSummaryForm() {
           disabled={loading}
         >
           {loading ? "Carregando..." : "Buscar Notícias"}
-          RESUMIR OS E-MAILS
         </Button>
       </Grid>
 
@@ -95,66 +102,16 @@ export default function EmailSummaryForm() {
           borderRadius="5px"
           padding="20px"
         >
-          <Typography width="px">Resposta:</Typography>
-
+          <Typography>Resposta:</Typography>
+          <br/>
           <Stack padding="2">
-            <Box>
-              <Typography fontWeight="bold" marginTop="10px">
-                Leitura de e-mails
-              </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                marginTop="10px"
-              >
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s, when an unknown printer took a galley
-                of type and scrambled it to make a type specimen book. It has
-                survived not only five centuries, but also the leap into
-                electronic typesetting, remaining essentially unchanged. It was
-                popularised in the 1960s with the release of Letraset sheets
-                containing Lorem Ipsum passages, and more recently with desktop
-                publishing software like Aldus PageMaker including versions of
-                Lorem Ipsum.
-              </Typography>
-            </Box>
-            <Box>
-              <Typography fontWeight="bold" marginTop="10px">
-                Leitura de e-mails
-              </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                marginTop="10px"
-              >
-                Lorem Ipsum is simply dummy text of the printing and typesetting
-                industry. Lorem Ipsum has been the industry's standard dummy
-                text ever since the 1500s, when an unknown printer took a galley
-                of type and
-              </Typography>
-            </Box>
-            <Box>
-              <Typography
-                variant="body2"
-                fontSize="1"
-                marginTop="10px"
-                fontWeight="bold"
-              >
-                Leitura de e-mails
-              </Typography>
-              <Typography
-                variant="body2"
-                color="text.secondary"
-                marginTop="10px"
-              >
-                centuries, but also the leap into electronic typesetting,
-                remaining essentially unchanged. It was popularised in the 1960s
-                with the release of Letraset sheets containing Lorem Ipsum
-                passages, and more recently with desktop publishing software
-                like Aldus PageMaker including versions of Lorem Ipsum.
-              </Typography>
-            </Box>
+            {loading ? (
+              <Skeleton variant="rectangular" width="100%" height={200} />
+            ) : news ? (
+              <Box dangerouslySetInnerHTML={{ __html: news }} />
+            ) : (
+              <Typography color="text.secondary">Nenhuma notícia carregada.</Typography>
+            )}
           </Stack>
         </Box>
       </Grid>
