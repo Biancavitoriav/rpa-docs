@@ -8,7 +8,7 @@ import {
   Box,
   Stack,
 } from "@mui/material";
-import emailIcon from "../assets/email-icon.png";
+import bookIcon from "../assets/bookIcon.png";
 import { useState } from "react";
 import React from "react";
 
@@ -50,29 +50,21 @@ export default function EmailSummaryForm() {
             padding: 2,
           }}
         >
-          <Typography fontWeight="bold" marginLeft="60px">
-            <img
-              src={emailIcon}
-              alt="icon"
-              width={24}
-              height={24}
-              style={{ marginRight: 8, marginTop: 8 }}
-            />
-            Resumindo seus e-mails
-          </Typography>
+          <Box sx={{ display: "flex", alignItems: "center" }}>
+          <img src={bookIcon} alt="icone" style={{ width: 24, height: 24, marginRight: 8 }} />
+          <Typography fontWeight="bold">Resumindo suas notícias</Typography></Box>
+
         </Box>
       </Grid>
 
       {/* Formulário - Lado Esquerdo */}
-      <Grid item xs={8} md={4} marginTop={5}>
+      { <Grid item xs={8} md={4} marginTop={5}>
         <Typography variant="h5" fontWeight="bold">
-          Leitura de e-mails
+          Resumo de notícias
         </Typography>
-        <Typography>Preencha os campos a seguir</Typography>
+        <Typography marginTop="20px">Preencha os campos a seguir</Typography>
 
-        <TextField fullWidth label="Data" margin="normal" />
-        <TextField fullWidth label="Email" margin="normal" />
-        <TextField fullWidth label="Senha" margin="normal" type="password" />
+        <TextField fullWidth label="Quantidade De Notícias (máx: 6)" margin="normal" />
         <br />
         <Button
           onClick={handleClick}
@@ -82,12 +74,11 @@ export default function EmailSummaryForm() {
           disabled={loading}
         >
           {loading ? "Carregando..." : "Buscar Notícias"}
-          RESUMIR OS E-MAILS
         </Button>
-      </Grid>
+      </Grid> }
 
       {/* Resumo - Lado Direito */}
-      <Grid item xs={12} md={8}>
+       <Grid item xs={12} md={8}> 
         <Box
           marginTop="50px"
           marginLeft="30px"
@@ -158,6 +149,6 @@ export default function EmailSummaryForm() {
           </Stack>
         </Box>
       </Grid>
-    </Grid>
+    // </Grid>
   );
 }
