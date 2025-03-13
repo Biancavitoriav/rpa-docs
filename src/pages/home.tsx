@@ -15,14 +15,19 @@ export default function EmailSummaryForm() {
   const [news, setNews] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [limit, setLimit] = useState(0);
+  const [search, setSearch] = useState("");
 
   const handleOnChangeInput = (event: React.ChangeEvent<HTMLInputElement>) => {
     const value = parseInt(event.target.value, 10) || 0;
     setLimit(value);
   };
+  const handleOnChangeInputSearchNews = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value ;
+    setSearch(value);
+  };
 
   const cleanResponse = (htmlString: string) => {
-    return htmlString.replace(/\n/g, "").trim(); // Remove quebras de linha e espaços extras
+    return htmlString.replace(/\n/g, "").trim(); 
   };
 
   const handleClick = async () => {
@@ -31,14 +36,14 @@ export default function EmailSummaryForm() {
       console.log("ENTROU NO HANDLE CLICK>>>>>>>>>");
 
       const response = await fetch(`http://localhost:3001/scrape-news?limit=${limit}`);
-      const data = await response.json(); // Pegando a resposta como JSON
+      const data = await response.json(); 
 
       if (!response.ok) {
         throw new Error(`Erro na API: ${response.status}`);
       }
 
       if (data.result) {
-        const cleanedHtml = cleanResponse(data.result); // Pegando apenas o "result" e limpando
+        const cleanedHtml = cleanResponse(data.result); 
         setNews(cleanedHtml);
         console.log(cleanedHtml);
       } else {
@@ -49,6 +54,32 @@ export default function EmailSummaryForm() {
     }
     setLoading(false);
   };
+
+  const handleClicks = async () => {
+    setLoading(true);
+    try {
+      console.log("ENTROU NO HANDLE CLICK>>>>>>>>>");
+
+      const response = await fetch(`http://localhost:3001/search-news?q=${search}`);
+      const data = await response.json(); 
+
+      if (!response.ok) {
+        throw new Error(`Erro na API: ${response.status}`);
+      }
+
+      if (data.result) {
+        const cleanedHtml = cleanResponse(data.result); 
+        setNews(cleanedHtml);
+        console.log(cleanedHtml);
+      } else {
+        console.error("Erro: 'result' não encontrado no JSON.");
+      }
+    } catch (error) {
+      console.error("Erro ao chamar a API:", error);
+    }
+    setLoading(false);
+  };
+
 
   return (
     <Grid container columns={12} spacing={2} padding={3}>
@@ -77,29 +108,41 @@ export default function EmailSummaryForm() {
 
         <TextField
           fullWidth
-          label="Quantidade De Notícias (máx: 6)"
+          label="Quantidade De Notícias (máx: 4)"
           margin="normal"
           type="number"
           value={limit}
           onChange={handleOnChangeInput}
         />
-        <Typography marginTop="20px">Digite o tema da notícia que será pesquisado no campo abaixo</Typography>
-        <TextField
-          fullWidth
-          label="Tema da notícia"
-          margin="normal"
-          onChange={handleOnChangeInput}
-        />
-
-        <br />
+         <br />
         <Button
           onClick={handleClick}
           fullWidth
           variant="contained"
           sx={{ marginTop: 2, fontWeight: 800 }}
           disabled={loading}
+        > {loading ? "Carregando..." : "Buscar Notícias da Home"}
+        </Button>
+          
+        
+        <Typography marginTop="20px">Digite o tema da notícia que será pesquisado no campo abaixo</Typography>
+        <TextField
+          fullWidth
+          label="Tema da notícia"
+          margin="normal"
+          value={search}
+          onChange={handleOnChangeInputSearchNews}
+        />
+
+        <br />
+        <Button
+          onClick={handleClicks}
+          fullWidth
+          variant="contained"
+          sx={{ marginTop: 2, fontWeight: 800 }}
+          disabled={loading}
         >
-          {loading ? "Carregando..." : "Buscar Notícias"}
+          {loading ? "Carregando..." : "Buscar Minha Notícia"}
         </Button>
       </Grid> }
 
@@ -125,6 +168,6 @@ export default function EmailSummaryForm() {
           </Stack>
         </Box>
       </Grid>
-    // </Grid>
+    </Grid>
   );
 }

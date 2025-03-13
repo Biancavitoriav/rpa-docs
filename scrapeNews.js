@@ -24,9 +24,9 @@ async function scrapeG1News(limit) {
     return Array.from(
       document.querySelectorAll("a.gui-color-primary.gui-color-hover")
     )
-      .slice(0, limit) // Limitando o número de links
+      .slice(0, limit) 
       .map((link) => link.href);
-  }, limit); // Passando `limit` como argumento
+  }, limit); 
   
  
   let articles = [];
@@ -54,7 +54,7 @@ async function scrapeG1News(limit) {
  
       articles.push({ link, ...article });
     } catch (error) {
-      console.error(`Erro ao acessar ${link}:`, error.message);
+      console.error("Erro ao acessar ${link}:", error.message);
     }
   }
  
@@ -82,6 +82,83 @@ app.get("/scrape-news", async (req, res) => {
 });
 
  
+
+
+
+
+async function searchG1News(query) {
+  const browser = await puppeteer.launch({ headless: false, args: ["--start-fullscreen"]  });
+  const page = await browser.newPage();
+  await page.setViewport({ width: 1366, height: 768 });
+
+
+  await page.goto("https://g1.globo.com/", { waitUntil: "load", timeout: 0 });
+
+  await page.waitForSelector("#busca-campo", { visible: true });
+  await page.type("#busca-campo", query, );
+  await page.keyboard.press("Enter");
+
+  await page.waitForNavigation({ waitUntil: "load", timeout: 0 });
+
+  await page.waitForSelector('.widget.widget--card.widget--info');
+
+  const widgets = await page.$$('.widget.widget--card.widget--info');
+
+  for (let widget of widgets) {
+
+    const textContainer = await widget.$('.widget--info__text-container');
+    
+
+    const textContent = await page.evaluate(el => el.textContent.trim(), textContainer);
+
+
+    if (textContent.includes('G1')) {
+      const anchor = await textContainer.$('a');
+      if (anchor) {
+        await anchor.click();
+        console.log('Clicando no link...');
+        break;
+      }
+    }
+  }
+
+  const article = await page.evaluate(() => {
+    const title = document.querySelector("h1")?.innerText || "Sem título";
+    const author =
+      document.querySelector(".content-publication-data__from")?.innerText ||
+      "Autor não informado";
+    const content = Array.from(document.querySelectorAll("p"))
+      .map((p) => p.innerText)
+      .join("\n");
+    const dateElement =
+      document.querySelector(".content-publication-data__updated time") ||
+      document.querySelector("time");
+    const publishedDate = dateElement ? dateElement.getAttribute("datetime") : "";
+
+    return { title, author, content, publishedDate };
+  });
+
+  await browser.close();
+  return article;
+}
+
+app.get("/search-news", async (req, res) => {
+  try {
+    const q = req.query.q 
+    const news = await searchG1News(q);
+    
+    console.log(news);
+
+    const response = await axios.post("http://127.0.0.1:5000/ler-arquivo", {
+      infos: news,
+    });
+
+    res.json(response.data);
+  } catch (error) {
+    res.status(500).json(error.message);
+  }
+});
+
 app.listen(PORT, () => {
   console.log(`Servidor rodando em http://localhost:${PORT}`);
 });

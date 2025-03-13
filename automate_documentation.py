@@ -10,7 +10,6 @@ load_dotenv()
 @app.route('/ler-arquivo', methods=['POST'])
 def ler_arquivo():
     try:
-        print('aaaaaaaaaaaaaaaaaaaaaaaaaaaaa')
         requestS = request.get_json()
         noticias = requestS.get("infos", "Sem notícias disponíveis")
         print(noticias)
