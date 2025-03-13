@@ -83,6 +83,13 @@ export default function EmailSummaryForm() {
           value={limit}
           onChange={handleOnChangeInput}
         />
+        <Typography marginTop="20px">Digite o tema da notícia que será pesquisado no campo abaixo</Typography>
+        <TextField
+          fullWidth
+          label="Tema da notícia"
+          margin="normal"
+          onChange={handleOnChangeInput}
+        />
 
         <br />
         <Button
@@ -99,7 +106,7 @@ export default function EmailSummaryForm() {
       {/* Resumo - Lado Direito */}
        <Grid item xs={12} md={8}> 
         <Box
-          marginTop="50px"
+          marginTop="100px"
           marginLeft="30px"
           border="1px solid rgb(38, 38, 38)"
           borderRadius="5px"
